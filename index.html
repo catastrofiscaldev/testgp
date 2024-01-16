@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Ejecutar Servicio de Geoprocesamiento - ArcGIS API para JavaScript 3.x</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.45/esri/css/esri.css">
+    <script src="https://js.arcgis.com/3.45/"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0%;
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 80%;
+            height: 60%;
+            border: none;
+        }
+
+        button {
+            width: 80%;
+            height: 30px;
+            border: none;
+            background-color: #0079c1;
+            color: white
+        }
+    </style>
+    <script>
+        var map;
+
+        require([
+            "esri/tasks/Geoprocessor",
+            "dojo/domReady!"
+        ], function (Geoprocessor) {
+
+            // se define la url del gpservice
+            var gpUrl = "https://ws.mineco.gob.pe/serverdf/rest/services/geoprocesos/downloadDataApp/GPServer/Descargar%20datos%20de%20campo";
+
+            // se instancia el geoprocesador
+            var geoprocessor = new Geoprocessor(gpUrl);
+
+            // funcion que ejecuta el servicio de geoprocesamiento
+            function runGeoprocessing(evt) {
+                evt.currentTarget.disabled = true;
+                document.querySelector("textarea").value = "Procesando...";
+                // Parametros
+                var params = {
+                    id_user: "62",
+                };
+                // ejecucion del servicio de geoprocesamiento
+                geoprocessor.submitJob(params, gpJobComplete, gpJobStatus, gpJobFailed);
+            }
+
+            // Se ejecuta si el proceso termina correctamente
+            function gpJobComplete(jobInfo) {
+                // Se obtiene el resultado mediante el jobId y el nombre del parametro de salida
+                geoprocessor.getResultData(jobInfo.jobId, "response", function (result) {
+                    document.querySelector("textarea").value = JSON.stringify(result.value);
+                    console.log(JSON.stringify(result.value));
+                    document.querySelector("button").disabled = false;
+                });
+            }
+
+            // Se ejecuta si el proceso esta en ejecucion
+            function gpJobStatus(jobInfo) {
+                console.log(jobInfo.jobStatus);
+            }
+
+            // Se ejecuta si el proceso falla
+            function gpJobFailed(error) {
+                alert("Geoprocessing service failed")
+                console.error("Geoprocessing job failed: ", error);
+                document.querySelector("button").disabled = false;
+            }
+
+            // Ejecuta el servicio de geoprocesamiento
+            document.querySelector("button").addEventListener("click", runGeoprocessing);
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <button>
+            Ejecutar
+        </button>
+        <textarea name="" id="" cols="30" rows="10">
+
+        </textarea>
+    </div>
+
+</body>
+
+</html>
