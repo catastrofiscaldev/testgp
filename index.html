@@ -27,6 +27,12 @@
             margin-top: 20px;
         }
 
+        input {
+            width: 80%;
+            height: 30px;
+            margin-bottom: 10px;
+        }
+
         textarea {
             width: 80%;
             height: 60%;
@@ -38,7 +44,8 @@
             height: 30px;
             border: none;
             background-color: #0079c1;
-            color: white
+            color: white;
+            cursor: pointer;
         }
     </style>
     <script>
@@ -58,10 +65,11 @@
             // funcion que ejecuta el servicio de geoprocesamiento
             function runGeoprocessing(evt) {
                 evt.currentTarget.disabled = true;
+                const value = document.querySelector("input").value;
                 document.querySelector("textarea").value = "Procesando...";
                 // Parametros
                 var params = {
-                    id_user: "62",
+                    id_user: value,
                 };
                 // ejecucion del servicio de geoprocesamiento
                 geoprocessor.submitJob(params, gpJobComplete, gpJobStatus, gpJobFailed);
@@ -97,6 +105,7 @@
 
 <body>
     <div class="container">
+        <input type="text">
         <button>
             Ejecutar
         </button>
